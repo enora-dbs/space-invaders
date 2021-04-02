@@ -22,12 +22,17 @@ nous avons Défini des touches qui vont permettre de diriger le canon mobile: Ri
 pour cela nous avons du definir les fonctions
 
 le jeudi 1/04/21
-nous allons creer le __main__
+nous avons creer le __main__ et nous avons commmencer a creer la classe pour les ennemis
+
+le vendredi 2/04/21
+nous avons continuer la class pour les ennemis et nous allons commencer a creer le joueur qui sera representé par un canon
 
 
 evolution de notre programme: 
 from tkinter import *
 from random import *
+
+
 
 # Cette fonction affiche l'écran de présentation du jeu
 def EcranDePresentation():
@@ -38,6 +43,30 @@ def EcranDePresentation():
         can.delete(ALL)
         fen.after(1500,Titre)
         
+#creation de la class pour les ennemis
+class Ennemi():
+
+    def __init__(self,x,y,direction,ennemiType):
+
+        self.EnnemiType = ennemiType
+        self.Direction = direction
+
+        if ennemiType == 1:
+            ennemiImage = pygame.image.load("invader1.jpge")
+            self.Speed = 1
+            self.Score = 5
+
+        if ennemiType == 2:
+            ennemiImage = pygame.image.load("invader2.png")
+            self.Score = 10
+            self.Speed = 1
+            
+     def moveEnnemi(self):
+        if self.Direction == "right":
+            self.rect.x += self.Speed
+        if self.Direction == "left":
+            self.rect.x -= self.Speed
+
 #definir les fonctions       
 def right(event):
     # Modification de la variable globale direction
@@ -49,15 +78,15 @@ def left(event):
     global direction
     direction = 'left'
     
-def down(event):
+def tir_joueur(event):
     # Modification de la variable globale direction
     global direction
-    direction = 'down'
+    direction = 'tir_joueur'
     
-def up(event):
+def pause(event):
     # Modification de la variable globale direction
     global direction
-    direction = 'up'
+    direction = 'pause'
         
 if __name__ == "__main__":
     #defini la variable DebutJeu
@@ -86,8 +115,13 @@ if __name__ == "__main__":
     can.bind_all("<Right>",right)
     can.bind_all("<Left>",left)
     can.bind_all("<space>",tir_joueur)
-    can.bind_all("<p>",time.pause)
+    can.bind_all("<p>",pause)
     
     can.grid(row=1,column=0,columnspan=2,rowspan=3)
     
-
+    Ennemi()
+    fen.mainloop()
+    
+    
+    
+    
