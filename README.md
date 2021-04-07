@@ -27,12 +27,22 @@ nous avons creer le __main__ et nous avons commmencer a creer la classe pour les
 le vendredi 2/04/21
 nous avons continuer la class pour les ennemis et nous allons commencer a creer le joueur qui sera representé par un canon
 
+le mardi 5/04/21
+j'avais oublier de le marquer sur le readme, mais nous avons creer une fonction qui va permettre d'enregistrer le meilleur score
+avec un def SaveMeilleurScore. J'ai egalement defini le score de départ = 0
+
+le jeudi 8/04/21
+J'ai decider d'ameliorer la fonction def SaveMeilleurScore avec une autre fonction pour pouvoir afficher le nouveau score.
+J'utilise un def LoadMeilleurScore (j'ai trouvé ce def sur internet). 
+Comme jusqu'a present je n'ai pas rencontrer d'erreurs avec, j'ai decider d'utiliser un global.
+J'ai creer un  def existe afin de verifier l'existence d'un fichier, et pour m'en servir pour definir le score de depart.
+Pour le moment mon programme ne m'affiche pas d'erreur mais je n'arrive pas encore a interagir avec le jeu.
+
 
 evolution de notre programme: 
 from tkinter import *
 from random import *
-
-
+import pickle
 
 # Cette fonction affiche l'écran de présentation du jeu
 def EcranDePresentation():
@@ -43,7 +53,7 @@ def EcranDePresentation():
         can.delete(ALL)
         fen.after(1500,Titre)
         
-#creation de la class pour les ennemis
+#creation de la class pour les ennemi
 class Ennemi():
 
     def __init__(self,x,y,direction,ennemiType):
@@ -61,9 +71,10 @@ class Ennemi():
             self.Score = 10
             self.Speed = 1
             
-     def moveEnnemi(self):
+    def moveEnnemi(self):
         if self.Direction == "right":
             self.rect.x += self.Speed
+        
         if self.Direction == "left":
             self.rect.x -= self.Speed
 
@@ -116,12 +127,52 @@ if __name__ == "__main__":
     can.bind_all("<Left>",left)
     can.bind_all("<space>",tir_joueur)
     can.bind_all("<p>",pause)
+
+# on verifie l'existence d'un fichier
+
+    def existe(fname):
+        try:
+            f=open(fname,'r')
+            f.close()
+            return 1
+        except:
+            return 0
+
+# on defini le score de départ avec la valeur 0
+
+if existe('HighScore')==0: 
+    FichierScore=open('HighScore','w')
+    pickle.dump(0,FichierScore)
+    FichierScore.close()
+
+# Cette fonction va permettre d'enregistrer le meilleur score
+
+    def SaveMeilleurScore(resultat):
+        FichierScore=open('HighScore','r')
+        if resultat>lecture:
+            FichierScore=open('HighScore','w')
+            pickle.dump(resultat,FichierScore)
+            FichierScore.close()
+            fen.after(2000,MessageRecord)
+        else:
+            fen.after(15000,EcranDePresentation)
+        FichierScore.close()
+    
+    def LoadMeilleurScore():
+        global DebutJeu
+        if DebutJeu!=1:
+            FichierScore=open('HighScore','r')
+            lecture=pickle.load(FichierScore)
+            can.delete(ALL)
+            can.create_text(320,240,font=('Fixedsys',24),text="HIGH SCORE",fill='purple')
+            can.create_text(320,270,font=('Fixedsys',24),text=str(lecture),fill='purple')
+            FichierScore.close()
+        fen.after(3000,EcranDePresentation)
+
     
     can.grid(row=1,column=0,columnspan=2,rowspan=3)
     
     Ennemi()
+    EcranDePresentation()
+    afficherScore=[]
     fen.mainloop()
-    
-    
-    
-    
