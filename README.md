@@ -38,141 +38,145 @@ Comme jusqu'a present je n'ai pas rencontrer d'erreurs avec, j'ai decider d'util
 J'ai creer un  def existe afin de verifier l'existence d'un fichier, et pour m'en servir pour definir le score de depart.
 Pour le moment mon programme ne m'affiche pas d'erreur mais je n'arrive pas encore a interagir avec le jeu.
 
+Le lundi 03/05/21
+Pendant les vancances, j'a renconter quelque difficulter avec mon programme, j'ai donc decider de le recommencer.
+J'ai commmencer par modifier les import, j'ai decider d'utiliser un import turtle et un import os et d'enlever les tkinter.
+Je me suiis rendu compte que cherchais à faire quelque chose de trop compliqué. J'ai donc décider de faire un programme plus simple, mais plus effectif.
+J'ai commencer par créé l'ecran d'acceuil et le joueur, et faire bouger le joueur de gauche à droite.
+J'ai rencontré quelque probleme avec le cannon, mais j'ai réussi à me débloquer grace à l'aide de mon père.
+Mes inspirations principales sont, la chaine TokyoEdtech sur youtube, ansi qu'un programme sur internet dont je ne retrouve pas le nom. J'ai egalement fait appel à l'aide de mon père lorsque j'etait trop bloqué.
 
-evolution de notre programme: 
-from tkinter import *
-from random import *
-import pickle
 
-# Cette fonction affiche l'écran de présentation du jeu
-def EcranDePresentation():
-    global DebutJeu
-    if DebutJeu!=1:
-        AffichageScore.configure(text="",font=('Fixedsys',16))
-        AffichageVie.configure(text="",font=('Fixedsys',16))
-        can.delete(ALL)
-        fen.after(1500,Titre)
-        
-#creation de la class pour les ennemi
-class Ennemi():
+import turtle
+import os
+import math
 
-    def __init__(self,x,y,direction,ennemiType):
+#écran du jeu
+wn = turtle.Screen()
+wn.bgcolor("black")
+wn.title("Space invader - Enora et Marine")
+#wn.bgpic("Space_invaders_background.gif")
 
-        self.EnnemiType = ennemiType
-        self.Direction = direction
+#enemi et joueur
+#turtle.register_shape("invader.gif")
+#turtle.register_shape("player.gif")
 
-        if ennemiType == 1:
-            ennemiImage = pygame.image.load("invader1.jpge")
-            self.Speed = 1
-            self.Score = 5
+border_pen = turtle.Turtle()
+border_pen.speed(0)
+border_pen.color("white")
+border_pen.penup()
+border_pen.setposition(-300,-300)
+border_pen.pendown()
+border_pen.pensize(3)
+for side in range(4):
+    border_pen.fd(600)
+    border_pen.lt(90)
+border_pen.hideturtle()
 
-        if ennemiType == 2:
-            ennemiImage = pygame.image.load("invader2.png")
-            self.Score = 10
-            self.Speed = 1
-            
-    def moveEnnemi(self):
-        if self.Direction == "right":
-            self.rect.x += self.Speed
-        
-        if self.Direction == "left":
-            self.rect.x -= self.Speed
+#Creation du joueur
+player = turtle.Turtle()
+player.color("yellow")
+player.shape("square")
+player.penup()
+player.speed()
+player.setposition(0, -250)
+player.setheading(90)
+playerspeed = 20
 
-#definir les fonctions       
-def right(event):
-    # Modification de la variable globale direction
-    global direction
-    direction = 'right'
-    
-def left(event):
-    # Modification de la variable globale direction
-    global direction
-    direction = 'left'
-    
-def tir_joueur(event):
-    # Modification de la variable globale direction
-    global direction
-    direction = 'tir_joueur'
-    
-def pause(event):
-    # Modification de la variable globale direction
-    global direction
-    direction = 'pause'
-        
-if __name__ == "__main__":
-    #defini la variable DebutJeu
-    DebutJeu = 0
-    #créé un bouton 'commencer' et un bouton 'quitter'
-    fenetre = Tk()
-    bouton=Button(fenetre, text="commencer", command=fenetre.quit).pack(side=LEFT, padx=50, pady=5)
-    bouton2=Button(fenetre, text="quitter", command=fenetre.quit).pack(side=RIGHT, padx=50, pady=5)
-    
-    
-    # Création de la fenêtre principale
-    
-    fen=Tk()
-    
-    # Titre de la fenêtre
-    
-    fen.title('Space invaders')
-    
-    # Définition du canevas ( Ecran de jeu )
-    
-    can=Canvas(fen,width=640,height=480,bg='black')
-    
-    # Définition des touches qui vont permettre
-    # de diriger le canon mobile
-    
-    can.bind_all("<Right>",right)
-    can.bind_all("<Left>",left)
-    can.bind_all("<space>",tir_joueur)
-    can.bind_all("<p>",pause)
+ennemi = turtle.Turtle()
+ennemi.color("red")
+ennemi.shape("triangle")
+ennemi.penup()
+ennemi.speed()
+ennemi.setposition(-200, 250)
+ennemispeed = 3
 
-# on verifie l'existence d'un fichier
+#definition pour bouger le joueur
+def move_left():
+    x = player.xcor()
+    x -= playerspeed
+    if x < -280:
+        x = - 280
+    player.setx(x)
 
-    def existe(fname):
-        try:
-            f=open(fname,'r')
-            f.close()
-            return 1
-        except:
-            return 0
+def move_right():
+    x = player.xcor()
+    x += playerspeed
+    if x > 280:
+        x = 280
+    player.setx(x)
 
-# on defini le score de départ avec la valeur 0
+def shoot_bullet():
+    global bulletstate
+    if bulletstate == "ready":
+        bulletstate = "shoot"
+    x = player.xcor()
+    y = player.ycor() + 10
+    bullet.setposition(x, y)
+    bullet.showturtle()
 
-if existe('HighScore')==0: 
-    FichierScore=open('HighScore','w')
-    pickle.dump(0,FichierScore)
-    FichierScore.close()
+def iscollision(t1, t2):
+    distance = math.sqrt(math.pow(t1.xcor()-t2.xcor(),2)+math.pow(t1.xcor()-t2.xcor(),2)+math.pow(t1.ycor()-t2.ycor(),2))
+    if distance < 15:
+        return True
+    else:
+        return False
 
-# Cette fonction va permettre d'enregistrer le meilleur score
+# touche du clavier qui permettent de le bouger
+turtle.listen()
+turtle.onkey(move_left,"Left")
+turtle.onkey(move_right,"Right")
+turtle.onkey(shoot_bullet,"space")
 
-    def SaveMeilleurScore(resultat):
-        FichierScore=open('HighScore','r')
-        if resultat>lecture:
-            FichierScore=open('HighScore','w')
-            pickle.dump(resultat,FichierScore)
-            FichierScore.close()
-            fen.after(2000,MessageRecord)
-        else:
-            fen.after(15000,EcranDePresentation)
-        FichierScore.close()
-    
-    def LoadMeilleurScore():
-        global DebutJeu
-        if DebutJeu!=1:
-            FichierScore=open('HighScore','r')
-            lecture=pickle.load(FichierScore)
-            can.delete(ALL)
-            can.create_text(320,240,font=('Fixedsys',24),text="HIGH SCORE",fill='purple')
-            can.create_text(320,270,font=('Fixedsys',24),text=str(lecture),fill='purple')
-            FichierScore.close()
-        fen.after(3000,EcranDePresentation)
+#creation du cannon
+bullet = turtle.Turtle()
+bullet.color("red")
+bullet.shape("circle")
+bullet.penup()
+bullet.speed()
+bullet.setheading(90)
+bullet.shapesize(0.5, 0.5)
+bullet.hideturtle()
+bulletspeed = 20
+bulletstate = "ready"
 
-    
-    can.grid(row=1,column=0,columnspan=2,rowspan=3)
-    
-    Ennemi()
-    EcranDePresentation()
-    afficherScore=[]
-    fen.mainloop()
+#main loop
+while True :
+
+    #bouger l'ennemi
+    x = ennemi.xcor()
+    x += ennemispeed
+    ennemi.setx(x)
+
+    if ennemi.xcor() > 280:
+        y = ennemi.ycor()
+        y -=40
+        ennemispeed *= -1
+        ennemi.sety(y)
+
+    if ennemi.xcor() < -280:
+        y = ennemi.ycor()
+        y -=40
+        ennemispeed *= -1
+        ennemi.sety(y)
+
+    #bouger le cannon
+    if bulletstate == "shoot":
+        y = bullet.ycor()
+        y += bulletspeed
+        bullet.sety(y)
+
+    if bullet.ycor() > 275:
+        bullet.hideturtle()
+        bulletstate= "ready"
+
+    #regarder si il y a eu collision
+    if iscollision(bullet, ennemi):
+        #Reset le cannon
+        bullet.hideturtle()
+        bulletstate = "ready"
+        bullet.setposition(0, -400)
+        #Reset l'ennemi
+        ennemi.setposition(-200, 250)
+
+delay = input("Press enter to finish")
