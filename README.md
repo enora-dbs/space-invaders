@@ -47,6 +47,8 @@ J'ai rencontré quelque probleme avec le cannon, mais j'ai réussi à me débloq
 Mes inspirations principales sont, la chaine TokyoEdtech sur youtube, ansi qu'un programme sur internet dont je ne retrouve pas le nom. J'ai egalement fait appel à l'aide de mon père lorsque j'etait trop bloqué.
 
 
+Voila pour le moment mon nouveau programme:
+
 import turtle
 import os
 import math
