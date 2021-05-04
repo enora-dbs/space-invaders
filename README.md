@@ -39,33 +39,47 @@ J'ai creer un  def existe afin de verifier l'existence d'un fichier, et pour m'e
 Pour le moment mon programme ne m'affiche pas d'erreur mais je n'arrive pas encore a interagir avec le jeu.
 
 Le lundi 03/05/21
+Part 1
 Pendant les vancances, j'a renconter quelque difficulter avec mon programme, j'ai donc decider de le recommencer.
 J'ai commmencer par modifier les import, j'ai decider d'utiliser un import turtle et un import os et d'enlever les tkinter.
-Je me suiis rendu compte que cherchais à faire quelque chose de trop compliqué. J'ai donc décider de faire un programme plus simple, mais plus effectif.
+Je me suis rendu compte que cherchais à faire quelque chose de trop compliqué. J'ai donc décider de faire un programme plus simple, mais plus effectif.
 J'ai commencer par créé l'ecran d'acceuil et le joueur, et faire bouger le joueur de gauche à droite.
 J'ai rencontré quelque probleme avec le cannon, mais j'ai réussi à me débloquer grace à l'aide de mon père.
 Mes inspirations principales sont, la chaine TokyoEdtech sur youtube, ansi qu'un programme sur internet dont je ne retrouve pas le nom. J'ai egalement fait appel à l'aide de mon père lorsque j'etait trop bloqué.
+Pour faire bouger le canon j'ai utiliser un turtle.listen et turtle.onkey. 
+J'ai ensuite fait en sorte de pouvoir tirer avec le joueur avec un def shoot_bullet.
+
+Part 2
+J'ai cree le main loop, où j'ai reussi à faire bouger tout les ennemis en meme temps vers le bas et vers le haut lorsqu'il y à collision avec un if iscollision(bullet, ennemi):
+et faire en sorte de reset l'ennemi et augmenter le score si il y avais effectivement collision.
+J'ai ensuite definie le score base à zero, et ajoutée la partie du programme qui permet de rajouter 5 point à chaque collision avec un ennemi.
+J'ai ensuite ajoutée d'autres ennemis, et je les ais tous fait bouger en même temps avec un for e in enemies. J'ai egalement ajoutée les images pour le fond, les ennemis et le joueur.
+Enfin j'ai defini la vitesse des ennemis et celle du joueur, et completer mon programme en regroupant toute les parties.
+Mon programme finale est plus simple que celui que je pensais obtenir, mais il marche bien et me satisfait.
 
 
-Voila pour le moment mon nouveau programme:
+Mon programme:
 
 import turtle
 import os
 import math
+import random
 
-#écran du jeu
+# création d l'écran du jeu
 wn = turtle.Screen()
 wn.bgcolor("black")
 wn.title("Space invader - Enora et Marine")
-#wn.bgpic("Space_invaders_background.gif")
+#image pour l'ecran de fond
+wn.bgpic("Space_invaders_background.gif")
 
-#enemi et joueur
-#turtle.register_shape("invader.gif")
-#turtle.register_shape("player.gif")
+#image de l'enemi et du joueur
+turtle.register_shape("invader.gif")
+turtle.register_shape("player.gif")
 
+#creation de la zone de jeu
 border_pen = turtle.Turtle()
 border_pen.speed(0)
-border_pen.color("white")
+border_pen.color("black")
 border_pen.penup()
 border_pen.setposition(-300,-300)
 border_pen.pendown()
@@ -75,23 +89,45 @@ for side in range(4):
     border_pen.lt(90)
 border_pen.hideturtle()
 
+#score de départ à zero
+score = 0
+score_pen = turtle.Turtle()
+score_pen.speed(0)
+score_pen.color("white")
+score_pen.penup()
+score_pen.setposition(-290, 280)
+scorestring = "Score: %s" %score
+score_pen.write(scorestring, False, align="left", font=("Revue", 14, "normal"))
+score_pen.hideturtle()
+
 #Creation du joueur
 player = turtle.Turtle()
 player.color("yellow")
-player.shape("square")
+player.shape("player.gif")
 player.penup()
 player.speed()
 player.setposition(0, -250)
 player.setheading(90)
+#vitesse du joueur
 playerspeed = 20
 
-ennemi = turtle.Turtle()
-ennemi.color("red")
-ennemi.shape("triangle")
-ennemi.penup()
-ennemi.speed()
-ennemi.setposition(-200, 250)
+#nombre d'ennemi
+number_of_enemies = 7
+enemies = []
+for i in range(number_of_enemies):
+    enemies.append(turtle.Turtle())
+
+for ennemi in enemies:
+    ennemi.color("red")
+    ennemi.shape("invader.gif")
+    ennemi.penup()
+    ennemi.speed(0)
+    x = random.randint(-200, 200)
+    y = random.randint(100, 250)
+    ennemi.setposition(x, y)   
+#vitesse du joueur    
 ennemispeed = 3
+
 
 #definition pour bouger le joueur
 def move_left():
@@ -108,6 +144,7 @@ def move_right():
         x = 280
     player.setx(x)
 
+#def pour pouvoir tirer avec le joueur
 def shoot_bullet():
     global bulletstate
     if bulletstate == "ready":
@@ -117,6 +154,7 @@ def shoot_bullet():
     bullet.setposition(x, y)
     bullet.showturtle()
 
+#def pour si la balle touche un ennemi
 def iscollision(t1, t2):
     distance = math.sqrt(math.pow(t1.xcor()-t2.xcor(),2)+math.pow(t1.xcor()-t2.xcor(),2)+math.pow(t1.ycor()-t2.ycor(),2))
     if distance < 15:
@@ -145,23 +183,45 @@ bulletstate = "ready"
 #main loop
 while True :
 
-    #bouger l'ennemi
-    x = ennemi.xcor()
-    x += ennemispeed
-    ennemi.setx(x)
+    for ennemi in enemies:
+        #bouger l'ennemi
+        x = ennemi.xcor()
+        x += ennemispeed
+        ennemi.setx(x)
 
-    if ennemi.xcor() > 280:
-        y = ennemi.ycor()
-        y -=40
-        ennemispeed *= -1
-        ennemi.sety(y)
+        #bouger l'ennemi vers le bas puis vers le haut
+        if ennemi.xcor() > 280:
+            #bouger tout les ennemis en meme temps vers le bas
+            for e in enemies:
+                y = e.ycor()
+                y -=40
+                e.sety(y)
+            ennemispeed *= -1
 
-    if ennemi.xcor() < -280:
-        y = ennemi.ycor()
-        y -=40
-        ennemispeed *= -1
-        ennemi.sety(y)
+        if ennemi.xcor() < -280:
+            #bouger tout les ennemis en meme temps vers le bas
+            for e in enemies:
+                y = e.ycor()
+                y -=40
+                e.sety(y)
+            ennemispeed *= -1
 
+        #regarder si il y a eu collision et reset l'ennemi si c'est le cas en ajoutant 5 au score initial
+        if iscollision(bullet, ennemi):
+            #Reset le cannon
+            bullet.hideturtle()
+            bulletstate = "ready"
+            bullet.setposition(0, -400)
+            #Reset l'ennemi
+            x = random.randint(-200, 200)
+            y = random.randint(100, 250)
+            ennemi.setposition(x, y)
+            #augmenter le score si il y a collision
+            score += 5
+            scorestring = "Score: %s" %score
+            score_pen.clear()
+            score_pen.write(scorestring, False, align="left", font=("Revue", 14, "normal"))
+            
     #bouger le cannon
     if bulletstate == "shoot":
         y = bullet.ycor()
@@ -172,13 +232,3 @@ while True :
         bullet.hideturtle()
         bulletstate= "ready"
 
-    #regarder si il y a eu collision
-    if iscollision(bullet, ennemi):
-        #Reset le cannon
-        bullet.hideturtle()
-        bulletstate = "ready"
-        bullet.setposition(0, -400)
-        #Reset l'ennemi
-        ennemi.setposition(-200, 250)
-
-delay = input("Press enter to finish")
